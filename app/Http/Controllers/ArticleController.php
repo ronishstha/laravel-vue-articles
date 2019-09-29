@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use Illuminate\Http\Request;
+use App\Http\Resources\Article as ArticleResource;
 
 class ArticleController extends Controller
 {
@@ -14,7 +15,13 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        // Get articles
+        $articles = Article::paginate(15);
+
+        return $articles;
+
+        // Return collection of articles as a resource
+        return ArticleResource::collection($articles);
     }
 
     /**
@@ -25,7 +32,31 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $article = new Article();
+        $article->id = $request->article_id;
+        $article->title = $request->title;
+        $article->body = $request->body;
+
+        if ($article->save()) {
+            return new ArticleResource($article);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Article  $article
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id) {
+        $article = Article::findOrFail($id);
+        $article->title = $request->title;
+        $article->body = $request->body;
+
+        if ($article->save()) {
+            return new ArticleResource($article);
+        }
     }
 
     /**
@@ -34,9 +65,13 @@ class ArticleController extends Controller
      * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function show(Article $article)
+    public function show($id)
     {
-        //
+        // Get article
+        $article = Article::findOrFail($id);
+
+        // Return single article as a resource
+        return new ArticleResource($article);
     }
 
     /**
@@ -45,8 +80,13 @@ class ArticleController extends Controller
      * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Article $article)
+    public function destroy($id)
     {
-        //
+        // Get article
+        $article = Article::findOrFail($id);
+
+        if ($article->delete()) {
+            return new ArticleResource($article);
+        }
     }
 }
