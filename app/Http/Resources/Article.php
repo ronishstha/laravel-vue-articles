@@ -17,6 +17,7 @@ class Article extends JsonResource
         return parent::toArray($request);
     }
 
+    // add additional stuff with response
     public function with($request) {
         return [
             'version' => '1.0',
